@@ -45,7 +45,8 @@ def new_controller():
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función del controlador donde se crean las estructuras de datos
-    pass
+    control=controller.new_controller()
+    return control
 
 
 def print_menu():
@@ -62,12 +63,12 @@ def print_menu():
     print("0- Salir")
 
 
-def load_data(control):
+def load_data(control, mapa,tamaño, fc,bandera):
     """
     Carga los datos
     """
     #TODO: Realizar la carga de datos
-    pass
+    return controller.load_data(control, mapa,tamaño, fc,bandera)
 
 
 def print_data(control, id):
@@ -156,7 +157,45 @@ if __name__ == "__main__":
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 1:
             print("Cargando información de los archivos ....\n")
-            data = load_data(control)
+            print("_________________________________________")
+            
+            print("\nSeleccione una opción para continuar")
+            print("\nTipos de mapa")
+            print(" 1. PROBING \n 2. CHAINING")
+
+            mapa= input("\nSeleccione un tipo de mapa: ")
+    
+
+            print("\nTamaño de los archivos: ")
+            print(" 1. small\n 2.medium\n 3. large \n 4. 10 porciento\n 5. 20 porciento\n 6. 30 porciento\n 7. 40 porciento \n 8. 50 porciento \n 9. 60 porciento\n 10. 70 porciento\n 11. 80 porciento\n 12. 90 porciento")
+    
+            tamaño = input("\nSeleccione el tamaño de los archivos: ")
+            
+            print("\nFactor de carga del mapa: ")
+            if mapa == "1":
+                print(" 1) 0.1\n 2) 0.5\n 3) 0.7\n 4) 0.9")
+            else:
+                print(" 1) 2.00\n 2) 4.00\n 3) 6.00\n 4) 8.00")
+
+            fc = input("\nSeleccione el factor de carga del mapa: ")
+            print("\nQue quieres calcular")
+            print(" 1. Tiempo \n 2. Memoria")
+
+            bandera= input("\nSeleccione que quiere calcular: ")
+            
+            total_ofertas,total_empresas, total_ciudades ,delta_time, delta_memory = load_data(control, mapa,tamaño, fc,bandera)
+            print("_______________________________")
+            print("El total de ofertas de trabajo publicadas cargada"+str(total_ofertas))
+            print("El total de empreas es: "+str(total_empresas))
+            print("EL total de ciudades es: "+str(total_ciudades))
+            if bandera =="2":
+                print("memoria: "+str(delta_memory))
+            print("tiempo: "+str(delta_time))
+
+                
+            
+            
+            
         elif int(inputs) == 2:
             print_req_1(control)
 

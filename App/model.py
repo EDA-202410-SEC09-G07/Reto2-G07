@@ -46,23 +46,100 @@ dos listas, una para los videos, otra para las categorias de los mismos.
 # Construccion de modelos
 
 
-def new_data_structs():
+def new_data_structs(estructura,fc):
     """
     Inicializa las estructuras de datos del modelo. Las crea de
     manera vacía para posteriormente almacenar la información.
     """
     #TODO: Inicializar las estructuras de datos
-    pass
+    control = {
+            'jobs': None,
+            'skills': None,
+            'employment': None,
+            'multilocation': None}
+    
+
+    control['jobs'] = mp.newMap(1000,
+                                 maptype=estructura,
+                                 loadfactor=fc)
+    control['skills'] = mp.newMap(1000,
+                                     maptype=estructura,
+                                     loadfactor=fc
+                                     )
+    control['employment'] = mp.newMap(1000,
+                                    maptype=estructura,
+                                    loadfactor=fc
+                                    )
+    control['multilocation'] = mp.newMap(1000, 
+                                        maptype=estructura,
+                                        loadfactor=fc)
+    control['jobs_country'] = mp.newMap(1000, 
+                                        maptype=estructura,
+                                        loadfactor=fc)
+    control['jobs_empresa'] = mp.newMap(7000, 
+                                        maptype=estructura,
+                                        loadfactor=fc)
+    control['jobs_ciudad'] = mp.newMap(7000, 
+                                        maptype=estructura,
+                                        loadfactor=fc)
+    
+    
+
+    
+    """
+    Inicializa las estructuras de datos del modelo. Las crea de
+    manera vacía para posteriormente almacenar la información.
+    """
+    #TODO: Inicializar las estructuras de datos
+    return control
 
 
 # Funciones para agregar informacion al modelo
 
-def add_data(data_structs, data):
+def add_jobs(control, data):
     """
     Función para agregar nuevos elementos a la lista
     """
     #TODO: Crear la función para agregar elementos a una lista
-    pass
+    jobs=control["jobs"]
+    ID=data["id"] # 123
+    mp.put(jobs, ID,data) # Pasi es colombia
+    # Primer mapa, quie es un mapa de jobs, por llave de ID
+
+            
+    entry = mp.get(control["jobs_country"], data["country_code"])
+    # Segfundo mapa que es un mapa de jobs, y la llave es el pais
+    if entry is not None:
+        lst = me.getValue(entry)
+        lt.addLast(lst, data) 
+    else:
+        lst = lt.newList("ARRAY_LIST")
+        lt.addLast(lst, data)
+        mp.put(control["jobs_country"], data["country_code"], lst)
+
+    entry = mp.get(control["jobs_empresa"], data["company_name"])
+    # Tercer mapa 
+    if entry is not None:
+        lst = me.getValue(entry)
+        lt.addLast(lst, data) 
+    else:
+        lst = lt.newList("ARRAY_LIST")
+        lt.addLast(lst, data)
+        mp.put(control["jobs_empresa"], data["company_name"], lst)
+
+
+    entry = mp.get(control["jobs_ciudad"], data["city"])
+    # Tercer mapa 
+    if entry is not None:
+        lst = me.getValue(entry)
+        lt.addLast(lst, data) 
+    else:
+        lst = lt.newList("ARRAY_LIST")
+        lt.addLast(lst, data)
+        mp.put(control["jobs_ciudad"], data["city"], lst)
+    return control
+  
+    
 
 
 # Funciones para creacion de datos
@@ -77,6 +154,15 @@ def new_data(id, info):
 
 # Funciones de consulta
 
+def values (mapa):
+    lista_values=mp.valueSet(mapa)
+    return lista_values
+def keys (mapa):
+    lista_keys=mp.keySet(mapa)
+    return lista_keys
+def size_mapa(mapa):
+    return mp.size(mapa)
+
 def get_data(data_structs, id):
     """
     Retorna un dato a partir de su ID
@@ -85,12 +171,12 @@ def get_data(data_structs, id):
     pass
 
 
-def data_size(data_structs):
+def size(data_structs):
     """
     Retorna el tamaño de la lista de datos
     """
     #TODO: Crear la función para obtener el tamaño de una lista
-    pass
+    return lt.size(data_structs)
 
 
 def req_1(data_structs):

@@ -36,17 +36,128 @@ def new_controller():
     Crea una instancia del modelo
     """
     #TODO: Llamar la función del modelo que crea las estructuras de datos
-    pass
+    control={"model" :None}
+    return control
 
 
 # Funciones para la carga de datos
+def compare( mapa,tamaño, fc1,bandera):
+    
+    mapa = int(mapa)
+    tamaño = int(tamaño)
+    fc1 = int(fc1)
+    
+   
+    if mapa == 1:
+        fc = 0.1
+        estructura = "PROBING"
+        if fc1 == 1: 
+            fc = 0.1
+        if tamaño == 2:
+            fc = 0.5
+        if tamaño == 3:
+            fc = 0.7
+        if tamaño == 4:
+            fc = 0.9
+    else:
+        estructura = "CHAINING"
+        fc = 1
+        if fc1 == 1: 
+            fc = 2
+        if tamaño == 2:
+            fc = 4
+        if tamaño == 3:
+            fc = 6
+        if tamaño == 4:
+            fc = 8
+  
+    tm = 'small-'
+    if tamaño == 2:
+        tm = "medium-"
+    if tamaño == 3:
+        tm = "large-"
+    if tamaño == 4:
+        tm = "10-por-"
+    if tamaño == 5:
+        tm = "20-por-"
+    if tamaño == 6:
+        tm = "30-por-"
+    if tamaño == 7:
+        tm = "40-por-"
+    if tamaño == 8:
+        tm = "50-por-"
+    if tamaño == 9:
+        tm = "60-por-"
+    if tamaño == 10:
+        tm = "70-por-"
+    if tamaño == 11:
+        tm = "80-por-"
+    if tamaño == 12:
+        tm = "90-por-"
+    
+      
+    if bandera == "2":
+        flag = True
+    else:
+        flag = False
+        
+    return estructura, tm,fc,flag
 
-def load_data(control, filename):
+def load_data(control, mapa,tamaño, fc1,bandera):
     """
     Carga los datos del reto
     """
     # TODO: Realizar la carga de datos
-    pass
+    estructura, tm,fc,flag=compare( mapa,tamaño, fc1,bandera)
+    control['model'] = model.new_data_structs(estructura, fc)
+
+    # inicializa el proceso para medir memoria
+    if flag:
+        tracemalloc.start()
+        start_memory = get_memory() # Mido la memmoria antes de inicializar los datos, o antes de la carga de datos
+    
+    start_time = get_time()
+
+    total_ofertas,total_empresas, total_ciudades = load_jobs(control['model'], tm)
+    
+    
+
+    # finaliza el proceso para medir memoria
+    Delta_memory = 0
+    Delta_time = 0
+
+    if flag:
+        stop_memory = get_memory() # La memoria que se esta usando al finalizar la carga de datos
+        tracemalloc.stop()
+        # calcula la diferencia de memoria
+        Delta_memory = delta_memory(stop_memory, start_memory)
+    
+        # toma el tiempo al final del proceso
+    stop_time = get_time()
+        # calculando la diferencia en tiempo
+    Delta_time = delta_time(start_time, stop_time)
+
+    return total_ofertas,total_empresas, total_ciudades, Delta_time,Delta_memory
+
+def load_jobs(control, size):
+    jobs = cf.data_dir + str(size) + "jobs.csv"
+    input_file = csv.DictReader(open(jobs, encoding="utf-8"), delimiter=";") # Lista de diccionariuos de las de python
+    count=0
+    for job in input_file:
+        model.add_jobs(control, job)
+        count=count+1
+    print("----------")
+    print(count)
+
+    
+    
+    total_ofertas=model.size_mapa(control['jobs'])
+    total_empresas=model.size_mapa(control['jobs_empresa'])
+    total_ciudades=model.size_mapa(control['jobs_ciudad'])
+    
+    return total_ofertas, total_empresas, total_ciudades
+    
+    
 
 
 # Funciones de ordenamiento
