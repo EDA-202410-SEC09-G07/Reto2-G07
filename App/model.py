@@ -118,7 +118,7 @@ def add_jobs(control, data):
         mp.put(control["jobs_country"], data["country_code"], lst)
 
     entry = mp.get(control["jobs_empresa"], data["company_name"])
-    # Tercer mapa 
+    # Tercer mapa nombre de la compañia
     if entry is not None:
         lst = me.getValue(entry)
         lt.addLast(lst, data) 
@@ -129,7 +129,7 @@ def add_jobs(control, data):
 
 
     entry = mp.get(control["jobs_ciudad"], data["city"])
-    # Tercer mapa 
+    # Tercer mapa ciudad
     if entry is not None:
         lst = me.getValue(entry)
         lt.addLast(lst, data) 
