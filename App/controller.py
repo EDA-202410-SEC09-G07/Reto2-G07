@@ -25,6 +25,7 @@ import model
 import time
 import csv
 import tracemalloc
+from datetime import datetime
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -180,12 +181,14 @@ def get_data(control, id):
     pass
 
 
-def req_1(control):
+def req_1(control, N, code_country, level):
     """
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
-    pass
+    catalog = control['model']
+    
+    return model.req_1(catalog, N, code_country, level)
 
 
 def req_2(control):
@@ -196,12 +199,14 @@ def req_2(control):
     pass
 
 
-def req_3(control):
+def req_3(control, company_name, initial_date, final_date):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
+    catalog = control['model']
+    
+    return model.req_3(catalog, company_name, initial_date, final_date)
 
 
 def req_4(control):
@@ -219,12 +224,14 @@ def req_5(control):
     # TODO: Modificar el requerimiento 5
     pass
 
-def req_6(control):
+def req_6(control, numero_ciudad, level, year):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    pass
+    catalog = control['model']
+    
+    return model.req_6(catalog, numero_ciudad, level, year)
 
 
 def req_7(control):
@@ -235,12 +242,14 @@ def req_7(control):
     pass
 
 
-def req_8(control):
+def req_8(control, level, divisa, initial_date, final_date):
     """
     Retorna el resultado del requerimiento 8
     """
     # TODO: Modificar el requerimiento 8
-    pass
+    catalog = control['model']
+    
+    return model.req_8(catalog, level, divisa, initial_date, final_date)
 
 
 # Funciones para medir tiempos de ejecucion

@@ -78,13 +78,25 @@ def print_data(control, id):
     #TODO: Realizar la función para imprimir un elemento
     pass
 
-def print_req_1(control):
+def print_req_1(control, N, code_country, level):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    pass
-
+    sublist = controller.req_1(control, N, code_country, level)
+    
+    for element in lt.iterator(sublist):
+        print(f"Fechas: {element['published_at']}")
+        print(f"Titulo Oferta: {element['title']}")
+        print(f"Empresa: {element['company_name']}")
+        print(f"Nivel de experiencia: {element['experience_level']}")
+        print(f"País: {element['country_code']}")
+        print(f"Ciudad de la oferta: {element['city']}")
+        print(f"Tamaño de la empresa: {element['company_size']}")
+        print(f"Tipo de empleo: {element['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {element['open_to_hire_ukrainians']}\n\n")
+         
+    return sublist
 
 def print_req_2(control):
     """
@@ -94,12 +106,35 @@ def print_req_2(control):
     pass
 
 
-def print_req_3(control):
+def print_req_3(control, company_name, initial_date, final_date):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    lista_ofertas_empresa, juniors, mids, seniors  = controller.req_3(control, company_name, initial_date, final_date)
+
+    print("Ofertas de trabajo publicadas por la empresa: " + company_name)
+    print(lt.size(lista_ofertas_empresa))
+    print("Ofertas de trabajo publicadas por la empresa por nivel de experiencia")
+    print(f"Juniors: {juniors}" )
+    print(f"Mids: {mids}" )
+    print(f"Seniors: {seniors}" )
+        
+    counter = 0
+    for job in lt.iterator(mp.valueSet(lista_ofertas_empresa)):
+        
+        if counter == 21:
+            break
+        print(f"Fechas: {job["elements"][0]['published_at']}")
+        print(f"Titulo Oferta: {job["elements"][0]['title']}")
+        print(f"Empresa: {job["elements"][0]['company_name']}")
+        print(f"Nivel de experiencia: {job["elements"][0]['experience_level']}")
+        print(f"País: {job["elements"][0]['country_code']}")
+        print(f"Ciudad de la oferta: {job["elements"][0]['city']}")
+        print(f"Tamaño de la empresa: {job["elements"][0]['company_size']}")
+        print(f"Tipo de empleo: {job["elements"][0]['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {job["elements"][0]['open_to_hire_ukrainians']}\n\n")
+        counter += 1
 
 
 def print_req_4(control):
@@ -155,6 +190,7 @@ if __name__ == "__main__":
     while working:
         print_menu()
         inputs = input('Seleccione una opción para continuar\n')
+        
         if int(inputs) == 1:
             print("Cargando información de los archivos ....\n")
             print("_________________________________________")
@@ -192,18 +228,20 @@ if __name__ == "__main__":
                 print("memoria: "+str(delta_memory))
             print("tiempo: "+str(delta_time))
 
-                
-            
-            
-            
         elif int(inputs) == 2:
-            print_req_1(control)
+            N = int(input("Numero de ofertas a listar: "))
+            code_country = input("Código del país: ")
+            level = input("Nivel de experticia: ")
+            print_req_1(control, N, code_country, level)
 
         elif int(inputs) == 3:
             print_req_2(control)
 
         elif int(inputs) == 4:
-            print_req_3(control)
+            company_name = input("Nombre de la empresa: ")
+            initial_date = input("Fecha inicial (YYYY-MM-DD): ")
+            final_date = input("Fecha final (YYYY-MM-DD): ")
+            print_req_3(control, company_name, initial_date, final_date)
 
         elif int(inputs) == 5:
             print_req_4(control)
@@ -212,13 +250,20 @@ if __name__ == "__main__":
             print_req_5(control)
 
         elif int(inputs) == 7:
-            print_req_6(control)
+            numero_ciudad = input("Número de ciudades para consulta: ")
+            level = input("Nivel de experticia: ")
+            year = input("año")
+            print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
             print_req_7(control)
 
         elif int(inputs) == 9:
-            print_req_8(control)
+            level = input("Nivel de experticia: ")
+            divisa = input("Divisa de la consulta")
+            initial_date = input("Fecha inicial (YYYY-MM-DD): ")
+            final_date = input("Fecha final (YYYY-MM-DD): ")
+            print_req_8(control, level, divisa, initial_date, final_date)
 
         elif int(inputs) == 0:
             working = False

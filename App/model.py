@@ -37,6 +37,7 @@ from DISClib.Algorithms.Sorting import selectionsort as se
 from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
 assert cf
+import datetime
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -195,13 +196,34 @@ def req_2(data_structs):
     pass
 
 
-def req_3(data_structs):
+def req_3(control, company_name, initial_date, final_date):
     """
     Función que soluciona el requerimiento 3
     """
     # TODO: Realizar el requerimiento 3
-    pass
 
+    mapa_ofertas_empresa = control['jobs_empresa']
+    valores = mp.valueSet(control['jobs_empresa'])
+    
+    lista_ofertas_empresa = me.getValue(mp.get(mapa_ofertas_empresa, company_name))
+    
+    
+    junior = 0
+    mid = 0
+    senior = 0
+    print(type(mapa_ofertas_empresa))
+    
+    for job in lt.iterator(valores):
+        if job["elements"][0]['company_name'] == company_name and str(job["elements"][0]['published_at']) >= initial_date and str(job["elements"][0]['published_at']) <= final_date:
+            lt.addLast(lista_ofertas_empresa, job)
+            if job["elements"][0]['experience_level'] == 'junior':
+                junior += 1
+            elif job["elements"][0]['experience_level'] == 'mid':
+                mid += 1
+            else:
+                senior += 1
+    
+    return mapa_ofertas_empresa, junior, mid, senior
 
 def req_4(data_structs):
     """
@@ -219,12 +241,50 @@ def req_5(data_structs):
     pass
 
 
-def req_6(data_structs):
+def req_6(control, numero_ciudad, level, year):
     """
     Función que soluciona el requerimiento 6
     """
     # TODO: Realizar el requerimiento 6
-    pass
+    valores = mp.getValue(control['jobs_ciudad'])
+    llaves = mp.getKeys(control["jobs_ciudad"])
+    mapa = mp.newMap(numelements=10,
+           prime=20,
+           maptype='PROBING',
+           loadfactor = 1,
+           cmpfunction=None)
+    for job in lt.iterator(valores):
+        for llave in lt.iterator(llaves):
+            if job["elements"][0]["experience_level"] == level and (job["elements"][0]["published_at"])[0:4] == year:
+                mp.put(mapa, llave, job)
+                
+    mapa_retorno = mp.newMap(numelements=10,
+           prime=20,
+           maptype='PROBING',
+           loadfactor = 1,
+           cmpfunction=None)
+    valores2 = mp.getValue(mapa)
+    llaves2 = mp.getKeys(mapa)
+    
+    i = 0
+    while i < int(numero_ciudad):
+        inicial_size = 0 
+        job3 = ""
+        llave3= ""
+        for job in valores2:
+            for llave in llaves2:
+                size = len(job["elements"])
+                if size > inicial_size:
+                    inicial_size = size 
+                    job3 = job["elements"]
+                    llave3 = llave 
+        valores2["elements"].remove(job3)
+        llaves2["elements"].remove(llave3)
+        mp.put(mapa_retorno, llave3, job3) 
+        i += 1
+    return mapa_retorno 
+            
+            
 
 
 def req_7(data_structs):
