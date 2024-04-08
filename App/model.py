@@ -38,6 +38,7 @@ from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
 assert cf
 import datetime
+import math as m
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -225,12 +226,62 @@ def req_3(control, company_name, initial_date, final_date):
     
     return mapa_ofertas_empresa, junior, mid, senior
 
-def req_4(data_structs):
+def req_4(control, n_pais , fecha_i, fecha_f, ):
+    
     """
     Función que soluciona el requerimiento 4
     """
-    # TODO: Realizar el requerimiento 4
-    pass
+    # TODO: Realizar el requerimiento 4    
+    mapa_ofertas_pais= control["jobs_country"]
+    valores = mp.valueSet(control["jobs_country"])
+    
+    ofertas_pais = me.getValue(mp.get(mapa_ofertas_pais, n_pais))
+    def ordenar_ofertas(oferta_pais):
+        return oferta_pais["elements"][0]["published_at"], oferta_pais["elements"][0]["company"]["name"]
+    junior = 0
+    mid = 0
+    senior = 0
+    oferta_empresas= []
+    ciudades={}
+    max_c_o = ""
+    max_ofertas = 0
+    min_c_o = ""
+    min_ofertas = float('inf')
+    print(type(mapa_ofertas_pais))
+    
+    for job in lt.iterator(valores):
+        if job["elements"][0]["country_code"] == n_pais and str(job["elements"][0]["published_at"])>= fecha_i and str(job["elements"][0]['published_at']) <= fecha_f:
+            lt.addLast(ofertas_pais, job)
+            if job["elements"][0]['experience_level'] == 'junior':
+                junior += 1
+            elif job["elements"][0]['experience_level'] == 'mid':
+                mid += 1
+            else:
+                senior += 1
+            #para mirar las ofertas en pais y ciudades
+            for oferta in ofertas_pais:
+                n_empresa = oferta["elements"][0]["company_name"]
+                if n_empresa not in oferta_empresas:
+                    oferta_empresas.append(n_empresa)
+                ciudad_oferta = oferta["elements"][0]["city"]
+                ciudades[ciudad_oferta]= ciudades.get(ciudad_oferta, 0)+1
+            
+        #mayor y menor en ofertas
+            
+            for ciudad, num_ofertas in ciudades.items():
+                if num_ofertas > max_ofertas:
+                    max_ofertas = num_ofertas
+                    max_c_o = ciudad
+            for ciudad, num_ofertas in ciudades.items():
+                if num_ofertas < min_ofertas:
+                    min_ofertas = num_ofertas
+                    min_c_o = ciudad
+                    
+        ofertas_ordenadas = sorted(ofertas_pais, key=ordenar_ofertas)
+        
+            
+    return ofertas_pais, junior, mid, senior, ciudades, oferta_empresas,max_ofertas, max_c_o, min_ofertas, min_c_o, ofertas_ordenadas
+
 
 
 def req_5(data_structs):
@@ -285,14 +336,69 @@ def req_6(control, numero_ciudad, level, year):
     return mapa_retorno 
             
             
+def req_7(data_structs, n_paises, fecha_inicial, fecha_final):
+    """
+    Función que soluciona el requerimiento 7
+    """
+    map_country_codes = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
+    map_key_country_code_value_lst_cities = mp.newMap(1000, maptype='PROBING', cmpfunction=None)
+    map_cities = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
+    map_company_names = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
+    map_skills = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
+    map_multilocations = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
+    map_junior = mp.newMap(numelements=8, maptype='PROBING')
+    map_mid = mp.newMap(numelements=8, maptype='PROBING')
+    map_senior = mp.newMap(numelements=8, maptype='PROBING')
 
 
-def req_7(data_structs):
+    niveles_de_experticia = lt.newList('ARRAY_LIST')
+    lt.addLast(niveles_de_experticia, 'junior')
+    lt.addLast(niveles_de_experticia, 'mid')
+    lt.addLast(niveles_de_experticia, 'senior')
+
+    for oferta in lt.iterator(data_structs['jobs']):
+        if datetime.strptime(fecha_inicial[:9], '%Y-%m-%d') <= datetime.strptime(oferta['published_at'][:9], '%Y-%m-%d') <= datetime.strptime(fecha_final[:9], '%Y-%m-%d'):
+            if not mp.contains(map_country_codes, oferta['country_code']):
+                mp.put(map_country_codes, oferta['country_code'], 1)
+            else:
+                mp.put(map_country_codes, oferta['country_code'], mp.get(map_country_codes, oferta['country_code']) + 1)
+            if not mp.contains(map_key_country_code_value_lst_cities, oferta['city']):
+                mp.put(map_key_country_code_value_lst_cities, oferta['country_code'], oferta['city'])
+            else:
+                mp.put(map_key_country_code_value_lst_cities, oferta['country_code'], mp.get(map_country_codes, oferta['country_code']) + 1)
+            if not mp.contains(map_cities, oferta['city']):
+                mp.put(map_cities, oferta['city'], 1)
+            else:
+                mp.put(map_cities, oferta['city'], mp.get(map_cities, oferta['city']) + 1)
+            
+            for nivel_de_experticia in lt.iterator(niveles_de_experticia):
+                if nivel_de_experticia == oferta['experience_level']:
+                    if not mp.contains(map_company_names, oferta['company_name']):
+                        mp.put(map_company_names, oferta['company_name'], 1)
+                    else:
+                        mp.put(map_company_names, oferta['company_name'], mp.get(map_company_names, oferta['company_name']) + 1)
+                    for skill in lt.iterator(data_structs['skills']):
+                        if skill['id'] == oferta['id']:
+                            if not mp.contains(map_skills, skill['id']):
+                                mp.put(map_skills, skill['id'], 1)
+                            else:
+                                mp.put(map_skills, skill['id'], mp.get(map_skills, skill['id']) + 1)
+                    for multilocation in lt.iterator(data_structs['multilocations']):
+                        if multilocation['id'] == oferta['id']:
+                            if not mp.contains(map_multilocations, multilocation['id']):
+                                mp.put(map_multilocations, multilocation['id'], 1)
+                            else:
+                                mp.put(map_multilocations, multilocation['id'], mp.get(map_multilocations, multilocation['id']) + 1)
+                    sublst_n_country_codes = lt.subList(mp.keySet(map_country_codes), 1, n_paises)
+
+                    total_ofertas = sum(mp.valueSet(map_country_codes))
+                    cantidad_cities = mp.size(map_cities)
+                    promedio_nivel_skills = sum(mp.valueSet(map_skills))/mp.size(map_skills)
     """
     Función que soluciona el requerimiento 7
     """
     # TODO: Realizar el requerimiento 7
-    pass
+    
 
 
 def req_8(data_structs):

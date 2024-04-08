@@ -29,7 +29,7 @@ from DISClib.ADT import queue as qu
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 assert cf
-from tabulate import tabulate
+#from tabulate import tabulate
 import traceback
 
 """
@@ -137,20 +137,49 @@ def print_req_3(control, company_name, initial_date, final_date):
         counter += 1
 
 
-def print_req_4(control):
-    """
-        Función que imprime la solución del Requerimiento 4 en consola
-    """
-    # TODO: Imprimir el resultado del requerimiento 4
-    pass
-
+def print_req_4(control, n_pais, fecha_i, fecha_f):
+    (
+        ofertas_pais, 
+        junior, 
+        mid, 
+        senior, 
+        ciudades, 
+        oferta_empresas, 
+        max_ciudad_ofertas, 
+        max_ofertas, 
+        min_ofertas, 
+        min_ciudad_ofertas, 
+        ofertas_ordenadas
+    ) = controller.req_4(control, n_pais, fecha_i, fecha_f)
+    
+    print("Total de ofertas en el país:", len(ofertas_pais))
+    print("Total de empresas que publicaron ofertas:", len(oferta_empresas))
+    print("Número total de ciudades con ofertas publicadas:", len(ciudades))
+    print("Ciudad del país de consulta con mayor número de ofertas y su conteo:", max_ciudad_ofertas, "(", max_ofertas, "ofertas)")
+    print("Ciudad del país de consulta con menor número de ofertas (al menos una) y su conteo:", min_ciudad_ofertas, "(", min_ofertas, "ofertas)")
+    
+    print("Ofertas por nivel de experiencia:")
+    print("Junior:", junior)
+    print("Mid:", mid)
+    print("Senior:", senior)
+    
+    print("Listado de ofertas publicadas ordenados cronológicamente por fecha y nombre de la empresa:")
+    for oferta in ofertas_ordenadas[:21]: 
+        print("Fecha de publicación de la oferta:", oferta["elements"][0]["published_at"])
+        print("Título de la oferta:", oferta["elements"][0]["title"])
+        print("Nivel de experticia requerido:", oferta["elements"][0]["experience_level"])
+        print("Nombre de la empresa de la oferta:", oferta["elements"][0]["company"]["name"])
+        print("Ciudad de la empresa de la oferta:", oferta["elements"][0]["location"]["city"])
+        print("Tipo de lugar de trabajo de la oferta:", oferta["elements"][0]["employment_type"])
+        print("Tipo de trabajo, si es remoto o no:", oferta["elements"][0]["remote"])
+        print("Disponible a contratar ucranianos:", oferta["elements"][0]["allow_ukrainians"])
 
 def print_req_5(control):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    
 
 
 def print_req_6(control):
@@ -244,7 +273,10 @@ if __name__ == "__main__":
             print_req_3(control, company_name, initial_date, final_date)
 
         elif int(inputs) == 5:
-            print_req_4(control)
+            n_pais = input("Codigo del país:")
+            fecha_i = input("Fecha inicial (YYYY-MM-DD): ")
+            fecha_f = input("Fecha final (YYYY-MM-DD):")
+            print_req_4(control, n_pais, fecha_i, fecha_f )
 
         elif int(inputs) == 6:
             print_req_5(control)

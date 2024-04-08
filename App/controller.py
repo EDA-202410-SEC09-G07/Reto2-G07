@@ -209,13 +209,15 @@ def req_3(control, company_name, initial_date, final_date):
     return model.req_3(catalog, company_name, initial_date, final_date)
 
 
-def req_4(control):
+def req_4(control, pais, fecha_i, fecha_f):
     """
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
-    pass
-
+    catalog = control['model']
+    ofertas_pais, junior, mid, senior = model.req_4(catalog, pais, fecha_i, fecha_f)
+    
+    return  ofertas_pais, junior, mid, senior
 
 def req_5(control):
     """
@@ -234,13 +236,13 @@ def req_6(control, numero_ciudad, level, year):
     return model.req_6(catalog, numero_ciudad, level, year)
 
 
-def req_7(control):
+def req_7(control, n_paises, año_consulta, mes_consulta ):
     """
     Retorna el resultado del requerimiento 7
     """
     # TODO: Modificar el requerimiento 7
-    pass
-
+    catalog = control["model"]
+    return model.req_7(catalog, n_paises, año_consulta, mes_consulta)
 
 def req_8(control, level, divisa, initial_date, final_date):
     """
