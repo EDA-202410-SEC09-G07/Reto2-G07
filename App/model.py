@@ -180,13 +180,47 @@ def size(data_structs):
     return lt.size(data_structs)
 
 
-def req_1(data_structs):
+def req_1(control, N, code_country, level):
     """
     Función que soluciona el requerimiento 1
     """
     # TODO: Realizar el requerimiento 1
-    pass
-
+    valores = mp.valueSet(control['jobs_ciudad'])
+    llaves = mp.keySet(control["jobs_ciudad"])
+    mapa = mp.newMap(numelements=10,
+           prime=20,
+           maptype='PROBING',
+           loadfactor = 1,
+           cmpfunction=None)
+    for job in lt.iterator(valores):
+        for llave in lt.iterator(llaves):
+            if job["elements"][0]["experience_level"] == level and (job["elements"][0]["country_code"]) == code_country:
+                mp.put(mapa, llave, job)
+    ofertas_pais = mp.size(mapa)
+    valores1 = mp.valueSet(mapa)   
+    llaves1 = mp.keySet(mapa)    
+    longitud = lt.size(valores)
+    longitud_llaves = lt.size(llaves)
+    valores2 = lt.subList(valores, longitud-N, N)
+    llaves2 = lt.subList(llaves, longitud_llaves-N, N)
+    mapa_retorno = mp.newMap(numelements=10,
+           prime=20,
+           maptype='PROBING',
+           loadfactor = 1,
+           cmpfunction=None)
+    valores3 = []
+    llaves3 = []
+    for valor in lt.iterator(valores2):
+        valores3.append(valor)
+    for llave in lt.iterator(llaves2):
+        llaves3.append(llave)
+    
+    i = 0
+    while i < N:
+        mp.put(mapa_retorno, llaves3[i], valores3[i])
+        i += 1
+    return mapa_retorno, ofertas_pais
+        
 
 def req_2(data_structs):
     """
@@ -246,8 +280,8 @@ def req_6(control, numero_ciudad, level, year):
     Función que soluciona el requerimiento 6
     """
     # TODO: Realizar el requerimiento 6
-    valores = mp.getValue(control['jobs_ciudad'])
-    llaves = mp.getKeys(control["jobs_ciudad"])
+    valores = mp.valueSet(control['jobs_ciudad'])
+    llaves = mp.keySet(control["jobs_ciudad"])
     mapa = mp.newMap(numelements=10,
            prime=20,
            maptype='PROBING',
@@ -263,26 +297,30 @@ def req_6(control, numero_ciudad, level, year):
            maptype='PROBING',
            loadfactor = 1,
            cmpfunction=None)
-    valores2 = mp.getValue(mapa)
-    llaves2 = mp.getKeys(mapa)
-    
+    valores2 = mp.valueSet(mapa)
+    llaves2 = mp.keySet(mapa)
+    n_empresas = mp.size(mapa)
+    n_ciudades = lt.size(llaves)
     i = 0
     while i < int(numero_ciudad):
         inicial_size = 0 
         job3 = ""
         llave3= ""
-        for job in valores2:
-            for llave in llaves2:
+        for job in lt.iterator(valores2):
+            for llave in lt.iterator(llaves2):
                 size = len(job["elements"])
                 if size > inicial_size:
                     inicial_size = size 
                     job3 = job["elements"]
-                    llave3 = llave 
-        valores2["elements"].remove(job3)
-        llaves2["elements"].remove(llave3)
-        mp.put(mapa_retorno, llave3, job3) 
-        i += 1
-    return mapa_retorno 
+                    llave3 = llave
+        
+            
+                pos2 = lt.isPresent(llaves2, llave3)
+                lt.deleteElement(llaves2, pos2)
+                mp.put(mapa_retorno, llave3, job3) 
+                
+                i += 1
+    return mapa_retorno, n_ciudades, n_empresas 
             
             
 
@@ -295,7 +333,7 @@ def req_7(data_structs):
     pass
 
 
-def req_8(data_structs):
+def req_8(control, level, divisa, initial_date, final_date):
     """
     Función que soluciona el requerimiento 8
     """
