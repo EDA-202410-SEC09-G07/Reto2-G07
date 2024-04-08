@@ -83,20 +83,9 @@ def print_req_1(control, N, code_country, level):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    sublist = controller.req_1(control, N, code_country, level)
+    mapa = controller.req_1(control, N, code_country, level)[0]
+    print(mapa)
     
-    for element in lt.iterator(sublist):
-        print(f"Fechas: {element['published_at']}")
-        print(f"Titulo Oferta: {element['title']}")
-        print(f"Empresa: {element['company_name']}")
-        print(f"Nivel de experiencia: {element['experience_level']}")
-        print(f"País: {element['country_code']}")
-        print(f"Ciudad de la oferta: {element['city']}")
-        print(f"Tamaño de la empresa: {element['company_size']}")
-        print(f"Tipo de empleo: {element['workplace_type']}")
-        print(f"Disponibilidad Ucranianos {element['open_to_hire_ukrainians']}\n\n")
-         
-    return sublist
 
 def print_req_2(control):
     """
@@ -182,13 +171,18 @@ def print_req_5(control):
     
 
 
-def print_req_6(control):
+def print_req_6(control, numero_ciudad, level, year):
     """
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
-
+    mapa = controller.req_6(control, numero_ciudad, level, year)[0]
+    
+    n_ciudades = controller.req_6(control, numero_ciudad, level, year)[1]
+    n_empresas = controller.req_6(control, numero_ciudad, level, year)[2]
+    print(mapa)
+    print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_ciudades))
+    print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_empresas))
 
 def print_req_7(control):
     """
@@ -284,7 +278,7 @@ if __name__ == "__main__":
         elif int(inputs) == 7:
             numero_ciudad = input("Número de ciudades para consulta: ")
             level = input("Nivel de experticia: ")
-            year = input("año")
+            year = input("El año de la consulta: ")
             print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
