@@ -181,47 +181,13 @@ def size(data_structs):
     return lt.size(data_structs)
 
 
-def req_1(control, N, code_country, level):
+def req_1(data_structs):
     """
     Función que soluciona el requerimiento 1
     """
     # TODO: Realizar el requerimiento 1
-    valores = mp.valueSet(control['jobs_ciudad'])
-    llaves = mp.keySet(control["jobs_ciudad"])
-    mapa = mp.newMap(numelements=10,
-           prime=20,
-           maptype='PROBING',
-           loadfactor = 1,
-           cmpfunction=None)
-    for job in lt.iterator(valores):
-        for llave in lt.iterator(llaves):
-            if job["elements"][0]["experience_level"] == level and (job["elements"][0]["country_code"]) == code_country:
-                mp.put(mapa, llave, job)
-    ofertas_pais = mp.size(mapa)
-    valores1 = mp.valueSet(mapa)   
-    llaves1 = mp.keySet(mapa)    
-    longitud = lt.size(valores)
-    longitud_llaves = lt.size(llaves)
-    valores2 = lt.subList(valores, longitud-N, N)
-    llaves2 = lt.subList(llaves, longitud_llaves-N, N)
-    mapa_retorno = mp.newMap(numelements=10,
-           prime=20,
-           maptype='PROBING',
-           loadfactor = 1,
-           cmpfunction=None)
-    valores3 = []
-    llaves3 = []
-    for valor in lt.iterator(valores2):
-        valores3.append(valor)
-    for llave in lt.iterator(llaves2):
-        llaves3.append(llave)
-    
-    i = 0
-    while i < N:
-        mp.put(mapa_retorno, llaves3[i], valores3[i])
-        i += 1
-    return mapa_retorno, ofertas_pais
-        
+    pass
+
 
 def req_2(data_structs):
     """
@@ -257,66 +223,42 @@ def req_3(control, company_name, initial_date, final_date):
                 mid += 1
             else:
                 senior += 1
-    
     return mapa_ofertas_empresa, junior, mid, senior
 
 def req_4(control, n_pais , fecha_i, fecha_f, ):
-    
     """
     Función que soluciona el requerimiento 4
     """
-    # TODO: Realizar el requerimiento 4    
-    mapa_ofertas_pais= control["jobs_country"]
+    # TODO: Realizar el requerimiento 4   
+    #ofertas periordo de consulta 
+    mapa_ofertas_pais = ["jobs_country"]
     valores = mp.valueSet(control["jobs_country"])
+    ofertas_pais= me.getValue(mp.get(mapa_ofertas_pais, n_pais))
     
-    ofertas_pais = me.getValue(mp.get(mapa_ofertas_pais, n_pais))
-    def ordenar_ofertas(oferta_pais):
-        return oferta_pais["elements"][0]["published_at"], oferta_pais["elements"][0]["company"]["name"]
-    junior = 0
-    mid = 0
-    senior = 0
-    oferta_empresas= []
-    ciudades={}
-    max_c_o = ""
-    max_ofertas = 0
-    min_c_o = ""
-    min_ofertas = float('inf')
+    
+    #El total de empresas que publicaron al menos una oferta en el país de consulta.
+    listado_empresas_o= mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
+    #Número total de ciudades del país de consulta en las que se publicaron ofertas
+    map_cities = mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
+    val_menor_map_cities= min(mp.valueSet(map_cities))
+    val_mayor_map_cities= max(mp.valueSet(map_cities))
     print(type(mapa_ofertas_pais))
-    
     for job in lt.iterator(valores):
         if job["elements"][0]["country_code"] == n_pais and str(job["elements"][0]["published_at"])>= fecha_i and str(job["elements"][0]['published_at']) <= fecha_f:
-            lt.addLast(ofertas_pais, job)
-            if job["elements"][0]['experience_level'] == 'junior':
-                junior += 1
-            elif job["elements"][0]['experience_level'] == 'mid':
-                mid += 1
+            lt.addLast(mapa_ofertas_pais, job)
+            #si la empresa está
+            if not mp.contains(listado_empresas_o, job['company_name']):
+                mp.put(listado_empresas_o, job['company_name'], 1)
             else:
-                senior += 1
-            #para mirar las ofertas en pais y ciudades
-            for oferta in ofertas_pais:
-                n_empresa = oferta["elements"][0]["company_name"]
-                if n_empresa not in oferta_empresas:
-                    oferta_empresas.append(n_empresa)
-                ciudad_oferta = oferta["elements"][0]["city"]
-                ciudades[ciudad_oferta]= ciudades.get(ciudad_oferta, 0)+1
-            
-        #mayor y menor en ofertas
-            
-            for ciudad, num_ofertas in ciudades.items():
-                if num_ofertas > max_ofertas:
-                    max_ofertas = num_ofertas
-                    max_c_o = ciudad
-            for ciudad, num_ofertas in ciudades.items():
-                if num_ofertas < min_ofertas:
-                    min_ofertas = num_ofertas
-                    min_c_o = ciudad
-                    
-        ofertas_ordenadas = sorted(ofertas_pais, key=ordenar_ofertas)
-        
-            
-    return ofertas_pais, junior, mid, senior, ciudades, oferta_empresas,max_ofertas, max_c_o, min_ofertas, min_c_o, ofertas_ordenadas
-
-
+                mp.put(listado_empresas_o, job['company_name'], mp.get(listado_empresas_o, job['company_name']) + 1)
+            #si la ciudad se encuentra
+            if not mp.contains(map_cities, job['city']):
+                mp.put(map_cities, job['city'],1)
+            else:
+                mp.put(map_cities, job['city'], mp.get(map_cities, job['city']) + 1)
+            #llave mayor con su valor
+    
+    return ofertas_pais, listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities
 
 def req_5(data_structs):
     """
@@ -331,8 +273,8 @@ def req_6(control, numero_ciudad, level, year):
     Función que soluciona el requerimiento 6
     """
     # TODO: Realizar el requerimiento 6
-    valores = mp.valueSet(control['jobs_ciudad'])
-    llaves = mp.keySet(control["jobs_ciudad"])
+    valores = mp.getValue(control['jobs_ciudad'])
+    llaves = mp.getKeys(control["jobs_ciudad"])
     mapa = mp.newMap(numelements=10,
            prime=20,
            maptype='PROBING',
@@ -348,32 +290,42 @@ def req_6(control, numero_ciudad, level, year):
            maptype='PROBING',
            loadfactor = 1,
            cmpfunction=None)
-    valores2 = mp.valueSet(mapa)
-    llaves2 = mp.keySet(mapa)
-    n_empresas = mp.size(mapa)
-    n_ciudades = lt.size(llaves)
+    valores2 = mp.getValue(mapa)
+    llaves2 = mp.getKeys(mapa)
+    
     i = 0
     while i < int(numero_ciudad):
         inicial_size = 0 
         job3 = ""
         llave3= ""
-        for job in lt.iterator(valores2):
-            for llave in lt.iterator(llaves2):
+        for job in valores2:
+            for llave in llaves2:
                 size = len(job["elements"])
                 if size > inicial_size:
                     inicial_size = size 
                     job3 = job["elements"]
-                    llave3 = llave
-        
-            
-                pos2 = lt.isPresent(llaves2, llave3)
-                lt.deleteElement(llaves2, pos2)
-                mp.put(mapa_retorno, llave3, job3) 
-                
-                i += 1
-    return mapa_retorno, n_ciudades, n_empresas 
+                    llave3 = llave 
+        valores2["elements"].remove(job3)
+        llaves2["elements"].remove(llave3)
+        mp.put(mapa_retorno, llave3, job3) 
+        i += 1
+    return mapa_retorno 
             
             
+
+
+#def req_7(control,  n_paises, año_consulta, mes_consulta):
+    
+"""  ofertas_por_pais = mp.getValue(control['jobs_pais'])
+    llaves_paises = mp.getKeys(control['jobs_pais'])
+    mapa = mp.newMap(numelements=10,
+           prime=20,
+           maptype='PROBING',
+           loadfactor = 1,
+           cmpfunction=None)
+    for job in lt.iterator(ofertas_por_pais):
+        for llave in lt.iterator(llaves_paises)
+        """
 def req_7(data_structs, n_paises, fecha_inicial, fecha_final):
     """
     Función que soluciona el requerimiento 7
@@ -439,7 +391,7 @@ def req_7(data_structs, n_paises, fecha_inicial, fecha_final):
     
 
 
-def req_8(control, level, divisa, initial_date, final_date):
+def req_8(data_structs):
     """
     Función que soluciona el requerimiento 8
     """
