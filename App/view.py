@@ -83,9 +83,20 @@ def print_req_1(control, N, code_country, level):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    mapa = controller.req_1(control, N, code_country, level)[0]
-    print(mapa)
+    sublist = controller.req_1(control, N, code_country, level)
     
+    for element in lt.iterator(sublist):
+        print(f"Fechas: {element['published_at']}")
+        print(f"Titulo Oferta: {element['title']}")
+        print(f"Empresa: {element['company_name']}")
+        print(f"Nivel de experiencia: {element['experience_level']}")
+        print(f"País: {element['country_code']}")
+        print(f"Ciudad de la oferta: {element['city']}")
+        print(f"Tamaño de la empresa: {element['company_size']}")
+        print(f"Tipo de empleo: {element['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {element['open_to_hire_ukrainians']}\n\n")
+         
+    return sublist
 
 def print_req_2(control):
     """
@@ -127,41 +138,27 @@ def print_req_3(control, company_name, initial_date, final_date):
 
 
 def print_req_4(control, n_pais, fecha_i, fecha_f):
-    (
-        ofertas_pais, 
-        junior, 
-        mid, 
-        senior, 
-        ciudades, 
-        oferta_empresas, 
-        max_ciudad_ofertas, 
-        max_ofertas, 
-        min_ofertas, 
-        min_ciudad_ofertas, 
-        ofertas_ordenadas
-    ) = controller.req_4(control, n_pais, fecha_i, fecha_f)
-    
-    print("Total de ofertas en el país:", len(ofertas_pais))
-    print("Total de empresas que publicaron ofertas:", len(oferta_empresas))
-    print("Número total de ciudades con ofertas publicadas:", len(ciudades))
-    print("Ciudad del país de consulta con mayor número de ofertas y su conteo:", max_ciudad_ofertas, "(", max_ofertas, "ofertas)")
-    print("Ciudad del país de consulta con menor número de ofertas (al menos una) y su conteo:", min_ciudad_ofertas, "(", min_ofertas, "ofertas)")
-    
-    print("Ofertas por nivel de experiencia:")
-    print("Junior:", junior)
-    print("Mid:", mid)
-    print("Senior:", senior)
-    
-    print("Listado de ofertas publicadas ordenados cronológicamente por fecha y nombre de la empresa:")
-    for oferta in ofertas_ordenadas[:21]: 
-        print("Fecha de publicación de la oferta:", oferta["elements"][0]["published_at"])
-        print("Título de la oferta:", oferta["elements"][0]["title"])
-        print("Nivel de experticia requerido:", oferta["elements"][0]["experience_level"])
-        print("Nombre de la empresa de la oferta:", oferta["elements"][0]["company"]["name"])
-        print("Ciudad de la empresa de la oferta:", oferta["elements"][0]["location"]["city"])
-        print("Tipo de lugar de trabajo de la oferta:", oferta["elements"][0]["employment_type"])
-        print("Tipo de trabajo, si es remoto o no:", oferta["elements"][0]["remote"])
-        print("Disponible a contratar ucranianos:", oferta["elements"][0]["allow_ukrainians"])
+    ofertas_pais , listado_empresas_o, map_cities= controller.req_4(control, n_pais, fecha_i, fecha_f)
+    print("Ofertas de trabajo publicadas en el país: " + n_pais)
+    print(lt.size(ofertas_pais))
+    print("el total de empresas que publicaron al menos una oferta: {listado_empresas_o}".format(listado_empresas_o=listado_empresas_o))
+    print("Número total de ciudades del país de consulta en las que se publicaron ofertas.1 {map_cities}".format(map_cities=map_cities))
+    print("La ciudad con mayor número de ofertas es : con:")
+    print("La ciudad con menor número de ofertas es: con:")
+    counter = 0
+    for job in lt.iterator(mp.valueSet(ofertas_pais)):
+        
+        if counter == 10:
+            break
+        print(f"Fecha de publicación de la oferta: {job['elements'][0]['published_at']}")
+        print(f"Titulo de la oferta: {job['elements'][0]['title']}")
+        print(f"Nivel de experiencia requerido: {job['elements'][0]['experience_level']}")
+        print(f"Nombre de la Empresa: {job['elements'][0]['company_name']}")
+        print(f"Ciudad de la oferta: {job['elements'][0]['city']}")
+        print(f"Tipo de lugar de trabajo: {job['elements'][0]['employment_type']}")
+        print(f"Tipo de trabajo, si es remoto o no: {job['elements'][0]['remote']}")
+        print(f"Disponibilidad Ucranianos {job['elements'][0]['open_to_hire_ukrainians']}\n\n")
+        counter += 1
 
 def print_req_5(control):
     """
@@ -171,18 +168,13 @@ def print_req_5(control):
     
 
 
-def print_req_6(control, numero_ciudad, level, year):
+def print_req_6(control):
     """
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    mapa = controller.req_6(control, numero_ciudad, level, year)[0]
-    
-    n_ciudades = controller.req_6(control, numero_ciudad, level, year)[1]
-    n_empresas = controller.req_6(control, numero_ciudad, level, year)[2]
-    print(mapa)
-    print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_ciudades))
-    print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_empresas))
+    pass
+
 
 def print_req_7(control):
     """
@@ -269,7 +261,7 @@ if __name__ == "__main__":
         elif int(inputs) == 5:
             n_pais = input("Codigo del país:")
             fecha_i = input("Fecha inicial (YYYY-MM-DD): ")
-            fecha_f = input("Fecha final (YYYY-MM-DD):")
+            fecha_f = input("Fecha final (YYYY-MM-DD): ")
             print_req_4(control, n_pais, fecha_i, fecha_f )
 
         elif int(inputs) == 6:
@@ -278,7 +270,7 @@ if __name__ == "__main__":
         elif int(inputs) == 7:
             numero_ciudad = input("Número de ciudades para consulta: ")
             level = input("Nivel de experticia: ")
-            year = input("El año de la consulta: ")
+            year = input("año")
             print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
