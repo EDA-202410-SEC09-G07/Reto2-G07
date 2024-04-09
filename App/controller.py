@@ -214,9 +214,9 @@ def req_4(control, n_pais, fecha_i, fecha_f):
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
-    ofertas_pais, listado_empresas_o, map_cities = model.req_4(control, n_pais, fecha_i, fecha_f)
+    catalog = control['model'] 
     
-    return ofertas_pais, listado_empresas_o, map_cities
+    return model.req_4(catalog, n_pais, fecha_i, fecha_f)
 
 def req_5(control):
     """

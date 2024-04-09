@@ -138,15 +138,15 @@ def print_req_3(control, company_name, initial_date, final_date):
 
 
 def print_req_4(control, n_pais, fecha_i, fecha_f):
-    ofertas_pais , listado_empresas_o, map_cities= controller.req_4(control, n_pais, fecha_i, fecha_f)
+    mapa_ofertas_pais , listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities= controller.req_4(control, n_pais, fecha_i, fecha_f)
     print("Ofertas de trabajo publicadas en el país: " + n_pais)
-    print(lt.size(ofertas_pais))
+    print(lt.size(mapa_ofertas_pais))
     print("el total de empresas que publicaron al menos una oferta: {listado_empresas_o}".format(listado_empresas_o=listado_empresas_o))
     print("Número total de ciudades del país de consulta en las que se publicaron ofertas.1 {map_cities}".format(map_cities=map_cities))
-    print("La ciudad con mayor número de ofertas es : con:")
-    print("La ciudad con menor número de ofertas es: con:")
+    print("La ciudad con mayor número de ofertas es : con: {valor_mayor_map_cities}".format(val_mayor_map_cities=val_mayor_map_cities))
+    print("La ciudad con menor número de ofertas es: con:{valor_menor_map_cities}".format(val_menor_map_cities=val_menor_map_cities))
     counter = 0
-    for job in lt.iterator(mp.valueSet(ofertas_pais)):
+    for job in lt.iterator(mp.valueSet(mapa_ofertas_pais)):
         
         if counter == 10:
             break
@@ -259,9 +259,9 @@ if __name__ == "__main__":
             print_req_3(control, company_name, initial_date, final_date)
 
         elif int(inputs) == 5:
-            n_pais = input("Codigo del país:")
+            n_pais = input("Codigo del país: ")
             fecha_i = input("Fecha inicial (YYYY-MM-DD): ")
-            fecha_f = input("Fecha final (YYYY-MM-DD): ")
+            fecha_f= input("Fecha final (YYYY-MM-DD): ")
             print_req_4(control, n_pais, fecha_i, fecha_f )
 
         elif int(inputs) == 6:

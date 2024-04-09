@@ -231,7 +231,7 @@ def req_4(control, n_pais , fecha_i, fecha_f, ):
     """
     # TODO: Realizar el requerimiento 4   
     #ofertas periordo de consulta 
-    mapa_ofertas_pais = ["jobs_country"]
+    mapa_ofertas_pais = control["jobs_country"]
     valores = mp.valueSet(control["jobs_country"])
     ofertas_pais= me.getValue(mp.get(mapa_ofertas_pais, n_pais))
     
@@ -239,9 +239,13 @@ def req_4(control, n_pais , fecha_i, fecha_f, ):
     #El total de empresas que publicaron al menos una oferta en el país de consulta.
     listado_empresas_o= mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
     #Número total de ciudades del país de consulta en las que se publicaron ofertas
+    
     map_cities = mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
+    
     val_menor_map_cities= min(mp.valueSet(map_cities))
+    
     val_mayor_map_cities= max(mp.valueSet(map_cities))
+    
     print(type(mapa_ofertas_pais))
     for job in lt.iterator(valores):
         if job["elements"][0]["country_code"] == n_pais and str(job["elements"][0]["published_at"])>= fecha_i and str(job["elements"][0]['published_at']) <= fecha_f:
@@ -258,7 +262,7 @@ def req_4(control, n_pais , fecha_i, fecha_f, ):
                 mp.put(map_cities, job['city'], mp.get(map_cities, job['city']) + 1)
             #llave mayor con su valor
     
-    return ofertas_pais, listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities
+    return mapa_ofertas_pais, listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities
 
 def req_5(data_structs):
     """
