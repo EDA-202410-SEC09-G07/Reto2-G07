@@ -37,8 +37,8 @@ from DISClib.Algorithms.Sorting import selectionsort as se
 from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
 assert cf
-import datetime
-import math as m
+from datetime import datetime
+from math import sqrt
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -225,42 +225,39 @@ def req_3(control, company_name, initial_date, final_date):
                 senior += 1
     return mapa_ofertas_empresa, junior, mid, senior
 
-def req_4(control, n_pais , fecha_i, fecha_f, ):
+def req_4(control, n_pais, fecha_i, fecha_f):
     """
     Función que soluciona el requerimiento 4
     """
-    # TODO: Realizar el requerimiento 4   
-    #ofertas periordo de consulta 
     mapa_ofertas_pais = control["jobs_country"]
-    valores = mp.valueSet(control["jobs_country"])
-    ofertas_pais= me.getValue(mp.get(mapa_ofertas_pais, n_pais))
+    valores = mp.valueSet(mapa_ofertas_pais)
+    ofertas_pais = me.getValue(mp.get(mapa_ofertas_pais, n_pais))
+    listado_empresas_o = mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
     
-    
-    #El total de empresas que publicaron al menos una oferta en el país de consulta.
-    listado_empresas_o= mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
-    #Número total de ciudades del país de consulta en las que se publicaron ofertas
-    
+    # Crear un mapa para almacenar el número de ofertas por ciudad
     map_cities = mp.newMap(numelements=100, maptype='PROBING', cmpfunction=None)
+    val_menor_map_cities = 10000
+    val_mayor_map_cities = 0
     
-    val_menor_map_cities= min(mp.valueSet(map_cities))
-    
-    val_mayor_map_cities= max(mp.valueSet(map_cities))
-    
-    print(type(mapa_ofertas_pais))
     for job in lt.iterator(valores):
-        if job["elements"][0]["country_code"] == n_pais and str(job["elements"][0]["published_at"])>= fecha_i and str(job["elements"][0]['published_at']) <= fecha_f:
-            lt.addLast(mapa_ofertas_pais, job)
-            #si la empresa está
+        if job["elements"][0]["country_code"] == n_pais and str(job["elements"][0]["published_at"]) >= fecha_i and str(job["elements"][0]['published_at']) <= fecha_f:
+            lt.addLast(ofertas_pais, job)
+            
+            # Contar empresas
             if not mp.contains(listado_empresas_o, job['company_name']):
                 mp.put(listado_empresas_o, job['company_name'], 1)
             else:
                 mp.put(listado_empresas_o, job['company_name'], mp.get(listado_empresas_o, job['company_name']) + 1)
-            #si la ciudad se encuentra
+                
+            # Contar ciudades
             if not mp.contains(map_cities, job['city']):
-                mp.put(map_cities, job['city'],1)
+                mp.put(map_cities, job['city'], 1)
             else:
                 mp.put(map_cities, job['city'], mp.get(map_cities, job['city']) + 1)
-            #llave mayor con su valor
+                
+                val_menor_map_cities = min(val_menor_map_cities, mp.get(map_cities, job['city']))
+                val_mayor_map_cities = max(val_mayor_map_cities, mp.get(map_cities, job['city']))
+
     
     return mapa_ofertas_pais, listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities
 
@@ -315,25 +312,15 @@ def req_6(control, numero_ciudad, level, year):
         i += 1
     return mapa_retorno 
             
-            
 
-
-#def req_7(control,  n_paises, año_consulta, mes_consulta):
-    
-"""  ofertas_por_pais = mp.getValue(control['jobs_pais'])
-    llaves_paises = mp.getKeys(control['jobs_pais'])
-    mapa = mp.newMap(numelements=10,
-           prime=20,
-           maptype='PROBING',
-           loadfactor = 1,
-           cmpfunction=None)
-    for job in lt.iterator(ofertas_por_pais):
-        for llave in lt.iterator(llaves_paises)
-        """
-def req_7(data_structs, n_paises, fecha_inicial, fecha_final):
+def req_7(data_structs, n_paises, year, month):
     """
     Función que soluciona el requerimiento 7
     """
+    # Filtrar las ofertas por mes y año
+    filtered_jobs = [oferta for oferta in data_structs['jobs'] if oferta['published_at'][:7] == f"{year}-{month:02d}"]
+ 
+    # Crear los mapas para almacenar la información
     map_country_codes = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
     map_key_country_code_value_lst_cities = mp.newMap(1000, maptype='PROBING', cmpfunction=None)
     map_cities = mp.newMap(numelements=1000, maptype='PROBING', cmpfunction=None)
@@ -344,55 +331,154 @@ def req_7(data_structs, n_paises, fecha_inicial, fecha_final):
     map_mid = mp.newMap(numelements=8, maptype='PROBING')
     map_senior = mp.newMap(numelements=8, maptype='PROBING')
 
-
+    # Crear una lista para almacenar los niveles de experticia
     niveles_de_experticia = lt.newList('ARRAY_LIST')
     lt.addLast(niveles_de_experticia, 'junior')
     lt.addLast(niveles_de_experticia, 'mid')
     lt.addLast(niveles_de_experticia, 'senior')
 
-    for oferta in lt.iterator(data_structs['jobs']):
-        if datetime.strptime(fecha_inicial[:9], '%Y-%m-%d') <= datetime.strptime(oferta['published_at'][:9], '%Y-%m-%d') <= datetime.strptime(fecha_final[:9], '%Y-%m-%d'):
-            if not mp.contains(map_country_codes, oferta['country_code']):
-                mp.put(map_country_codes, oferta['country_code'], 1)
-            else:
-                mp.put(map_country_codes, oferta['country_code'], mp.get(map_country_codes, oferta['country_code']) + 1)
-            if not mp.contains(map_key_country_code_value_lst_cities, oferta['city']):
-                mp.put(map_key_country_code_value_lst_cities, oferta['country_code'], oferta['city'])
-            else:
-                mp.put(map_key_country_code_value_lst_cities, oferta['country_code'], mp.get(map_country_codes, oferta['country_code']) + 1)
-            if not mp.contains(map_cities, oferta['city']):
-                mp.put(map_cities, oferta['city'], 1)
-            else:
-                mp.put(map_cities, oferta['city'], mp.get(map_cities, oferta['city']) + 1)
-            
-            for nivel_de_experticia in lt.iterator(niveles_de_experticia):
-                if nivel_de_experticia == oferta['experience_level']:
-                    if not mp.contains(map_company_names, oferta['company_name']):
-                        mp.put(map_company_names, oferta['company_name'], 1)
-                    else:
-                        mp.put(map_company_names, oferta['company_name'], mp.get(map_company_names, oferta['company_name']) + 1)
-                    for skill in lt.iterator(data_structs['skills']):
-                        if skill['id'] == oferta['id']:
-                            if not mp.contains(map_skills, skill['id']):
-                                mp.put(map_skills, skill['id'], 1)
-                            else:
-                                mp.put(map_skills, skill['id'], mp.get(map_skills, skill['id']) + 1)
-                    for multilocation in lt.iterator(data_structs['multilocations']):
-                        if multilocation['id'] == oferta['id']:
-                            if not mp.contains(map_multilocations, multilocation['id']):
-                                mp.put(map_multilocations, multilocation['id'], 1)
-                            else:
-                                mp.put(map_multilocations, multilocation['id'], mp.get(map_multilocations, multilocation['id']) + 1)
-                    sublst_n_country_codes = lt.subList(mp.keySet(map_country_codes), 1, n_paises)
+    # Recorrer las ofertas filtradas
+    for oferta in lt.iterator(filtered_jobs):
+        # Actualizar el mapa de códigos de país
+        if not mp.contains(map_country_codes, oferta['country_code']):
+            mp.put(map_country_codes, oferta['country_code'], 1)
+        else:
+            mp.put(map_country_codes, oferta['country_code'], mp.get(map_country_codes, oferta['country_code']) + 1)
+        
+        # Actualizar el mapa de claves de códigos de país y valores de listas de ciudades
+        if not mp.contains(map_key_country_code_value_lst_cities, oferta['country_code']):
+            mp.put(map_key_country_code_value_lst_cities, oferta['country_code'], lt.newList('SINGLE_LINKED', oferta['city']))
+        else:
+            lt.addLast(mp.get(map_key_country_code_value_lst_cities, oferta['country_code']), oferta['city'])
+        
+        # Actualizar el mapa de ciudades
+        if not mp.contains(map_cities, oferta['city']):
+            mp.put(map_cities, oferta['city'], 1)
+        else:
+            mp.put(map_cities, oferta['city'], mp.get(map_cities, oferta['city']) + 1)
+        
+        # Actualizar los mapas según el nivel de experticia
+        for nivel_de_experticia in lt.iterator(niveles_de_experticia):
+            if nivel_de_experticia == oferta['experience_level']:
+                # Actualizar el mapa de nombres de empresas
+                if not mp.contains(map_company_names, oferta['company_name']):
+                    mp.put(map_company_names, oferta['company_name'], 1)
+                else:
+                    mp.put(map_company_names, oferta['company_name'], mp.get(map_company_names, oferta['company_name']) + 1)
+                
+                # Actualizar el mapa de habilidades
+                for skill in lt.iterator(data_structs['skills']):
+                    if skill['id'] == oferta['id']:
+                        if not mp.contains(map_skills, skill['id']):
+                            mp.put(map_skills, skill['id'], 1)
+                        else:
+                            mp.put(map_skills, skill['id'], mp.get(map_skills, skill['id']) + 1)
+                
+                # Actualizar el mapa de multilocaciones
+                for multilocation in lt.iterator(data_structs['multilocations']):
+                    if multilocation['id'] == oferta['id']:
+                        if not mp.contains(map_multilocations, multilocation['id']):
+                            mp.put(map_multilocations, multilocation['id'], 1)
+                        else:
+                            mp.put(map_multilocations, multilocation['id'], mp.get(map_multilocations, multilocation['id']) + 1)
+                
+                # Obtener una sublista de claves de códigos de país
+                sublst_n_country_codes = lt.subList(mp.keySet(map_country_codes), 1, n_paises)
 
-                    total_ofertas = sum(mp.valueSet(map_country_codes))
-                    cantidad_cities = mp.size(map_cities)
-                    promedio_nivel_skills = sum(mp.valueSet(map_skills))/mp.size(map_skills)
-    """
-    Función que soluciona el requerimiento 7
-    """
-    # TODO: Realizar el requerimiento 7
+    # Calcular el total de ofertas de empleo
+    total_ofertas = sum(mp.valueSet(map_country_codes))
     
+    # Calcular el número de ciudades donde se ofertó en los países resultantes de la consulta
+    cantidad_cities = size(map_cities)
+    
+    # Calcular el promedio del nivel de habilidades solicitadas en las ofertas de trabajo
+    promedio_nivel_skills = sum(mp.valueSet(map_skills)) / size(map_skills)
+
+    # Encontrar el país con la mayor cantidad de ofertas
+    max_country_count = float('-inf')
+    max_country_code = None
+    for country_code in mp.keySet(map_country_codes):
+        count = mp.get(map_country_codes, country_code)
+        if count > max_country_count:
+            max_country_count = count
+            max_country_code = country_code
+    max_country_name = data_structs['country_codes'][max_country_code]
+
+    # Encontrar la ciudad con la mayor cantidad de ofertas
+    max_city_count = float('-inf')
+    max_city_name = None
+    for city_name in mp.keySet(map_cities):
+        count = mp.get(map_cities, city_name)
+        if count > max_city_count:
+            max_city_count = count
+            max_city_name = city_name
+
+    # Inicializar el diccionario para almacenar la información de los niveles de experticia
+    expertises_info = {}
+    
+    # Calcular información para cada nivel de experticia
+    for expertise in lt.iterator(niveles_de_experticia):
+        count_skills = size(map_skills)
+
+        # Encontrar la habilidad más solicitada
+        most_requested_skill_count = float('-inf')
+        most_requested_skill = None
+        for skill_id in mp.keySet(map_skills):
+            count = mp.get(map_skills, skill_id)
+            if count > most_requested_skill_count:
+                most_requested_skill_count = count
+                most_requested_skill = skill_id
+
+        # Encontrar la habilidad menos solicitada
+        least_requested_skill_count = float('inf')
+        least_requested_skill = None
+        for skill_id in mp.keySet(map_skills):
+            count = mp.get(map_skills, skill_id)
+            if count < least_requested_skill_count:
+                least_requested_skill_count = count
+                least_requested_skill = skill_id
+
+        min_avg_skill_level = None  # A completar
+        count_companies = size(map_company_names)
+
+        # Encontrar la empresa con más ofertas
+        max_offer_company_count = float('-inf')
+        max_offer_company = None
+        for company_name in mp.keySet(map_company_names):
+            count = mp.get(map_company_names, company_name)
+            if count > max_offer_company_count:
+                max_offer_company_count = count
+                max_offer_company = company_name
+
+        # Encontrar la empresa con menos ofertas
+        min_offer_company_count = float('inf')
+        min_offer_company = None
+        for company_name in mp.keySet(map_company_names):
+            count = mp.get(map_company_names, company_name)
+            if count < min_offer_company_count:
+                min_offer_company_count = count
+                min_offer_company = company_name
+
+        multilocation_count = size(map_multilocations)
+
+        # Agregar la información del nivel de experticia al diccionario
+        expertises_info[expertise] = {
+            "count_skills": count_skills,
+            "most_requested_skill": most_requested_skill,
+            "most_requested_skill_count": most_requested_skill_count,
+            "least_requested_skill": least_requested_skill,
+            "least_requested_skill_count": least_requested_skill_count,
+            "min_avg_skill_level": min_avg_skill_level,
+            "count_companies": count_companies,
+            "max_offer_company": max_offer_company,
+            "max_offer_company_count": max_offer_company_count,
+            "min_offer_company": min_offer_company,
+            "min_offer_company_count": min_offer_company_count,
+            "multilocation_count": multilocation_count
+        }
+
+    # Retornar los resultados calculados
+    return total_ofertas, cantidad_cities, max_country_name, max_country_count, max_city_name, max_city_count, expertises_info
 
 
 def req_8(data_structs):

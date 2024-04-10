@@ -138,26 +138,26 @@ def print_req_3(control, company_name, initial_date, final_date):
 
 
 def print_req_4(control, n_pais, fecha_i, fecha_f):
-    mapa_ofertas_pais , listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities= controller.req_4(control, n_pais, fecha_i, fecha_f)
-    print("Ofertas de trabajo publicadas en el país: " + n_pais)
-    print(lt.size(mapa_ofertas_pais))
-    print("el total de empresas que publicaron al menos una oferta: {listado_empresas_o}".format(listado_empresas_o=listado_empresas_o))
-    print("Número total de ciudades del país de consulta en las que se publicaron ofertas.1 {map_cities}".format(map_cities=map_cities))
-    print("La ciudad con mayor número de ofertas es : con: {valor_mayor_map_cities}".format(val_mayor_map_cities=val_mayor_map_cities))
-    print("La ciudad con menor número de ofertas es: con:{valor_menor_map_cities}".format(val_menor_map_cities=val_menor_map_cities))
+    mapa_ofertas_pais, listado_empresas_o, map_cities, val_mayor_map_cities, val_menor_map_cities= controller.req_4(control, n_pais, fecha_i, fecha_f)
+    
+    print(f"Ofertas de trabajo publicadas en el país: {n_pais}")
+    print(f"Total de empresas que publicaron al menos una oferta: {mp.size(listado_empresas_o)}")
+    print(f"Número total de ciudades del país con ofertas: {mp.size(map_cities)}")
+    print(f"Ciudad con mayor número de ofertas: {val_mayor_map_cities}")
+    print(f"Ciudad con menor número de ofertas: {val_menor_map_cities}\n")
+    
     counter = 0
     for job in lt.iterator(mp.valueSet(mapa_ofertas_pais)):
-        
         if counter == 10:
             break
         print(f"Fecha de publicación de la oferta: {job['elements'][0]['published_at']}")
-        print(f"Titulo de la oferta: {job['elements'][0]['title']}")
+        print(f"Título de la oferta: {job['elements'][0]['title']}")
         print(f"Nivel de experiencia requerido: {job['elements'][0]['experience_level']}")
         print(f"Nombre de la Empresa: {job['elements'][0]['company_name']}")
         print(f"Ciudad de la oferta: {job['elements'][0]['city']}")
         print(f"Tipo de lugar de trabajo: {job['elements'][0]['employment_type']}")
-        print(f"Tipo de trabajo, si es remoto o no: {job['elements'][0]['remote']}")
-        print(f"Disponibilidad Ucranianos {job['elements'][0]['open_to_hire_ukrainians']}\n\n")
+        print(f"Tipo de trabajo (remoto o no): {job['elements'][0]['remote']}")
+        print(f"Disponibilidad para ucranianos: {job['elements'][0]['open_to_hire_ukrainians']}\n")
         counter += 1
 
 def print_req_5(control):
@@ -176,12 +176,32 @@ def print_req_6(control):
     pass
 
 
-def print_req_7(control):
+def print_req_7(data_structs, n_paises, año_consulta, mes_consulta):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 7
-    pass
+    resultados = controller.req_7(data_structs, n_paises, año_consulta, mes_consulta)
+
+    total_ofertas, cantidad_cities, max_country_name, max_country_count, max_city_name, max_city_count, expertises_info = resultados
+
+    print("Resultados del requerimiento 7:")
+    print("--------------------------------")
+    print(f"Total de ofertas de empleo: {total_ofertas}")
+    print(f"Número de ciudades donde se ofertó: {cantidad_cities}")
+    print(f"País con la mayor cantidad de ofertas: {max_country_name} ({max_country_count} ofertas)")
+    print(f"Ciudad con la mayor cantidad de ofertas: {max_city_name} ({max_city_count} ofertas)")
+
+    print("\nDetalle de las habilidades por nivel de experticia:")
+    for nivel, info in expertises_info.items():
+        print(f"\nNivel de experticia: {nivel}")
+        print(f"Total de habilidades solicitadas: {info['count_skills']}")
+        print(f"Habilidad más solicitada: {info['most_requested_skill']} ({info['most_requested_skill_count']} veces)")
+        print(f"Habilidad menos solicitada: {info['least_requested_skill']} ({info['least_requested_skill_count']} veces)")
+        print(f"Nivel mínimo promedio de las habilidades: {info['min_avg_skill_level']}")
+        print(f"Total de empresas que publicaron ofertas: {info['count_companies']}")
+        print(f"Empresa con mayor número de ofertas: {info['max_offer_company']} ({info['max_offer_company_count']} ofertas)")
+        print(f"Empresa con menor número de ofertas: {info['min_offer_company']} ({info['min_offer_company_count']} ofertas)")
+        print(f"Número de empresas con sedes: {info['multilocation_count']}")
 
 
 def print_req_8(control):
@@ -274,7 +294,10 @@ if __name__ == "__main__":
             print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
-            print_req_7(control)
+            n_paises = input("Número de paises de consulta: ")
+            año_consulta = input("Año a consultar: ")
+            mes_consulta= input("Mes a consultar: ")
+            print_req_7(control, n_paises, año_consulta, mes_consulta) 
 
         elif int(inputs) == 9:
             level = input("Nivel de experticia: ")
