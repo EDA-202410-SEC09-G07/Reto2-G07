@@ -25,9 +25,6 @@
  """
 
 
-from matplotlib import table
-from numpy import average
-from sympy import false
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import stack as st

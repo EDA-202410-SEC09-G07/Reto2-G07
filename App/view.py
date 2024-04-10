@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-from matplotlib.pylab import f
 from tabulate import tabulate
 import config as cf
 import sys
