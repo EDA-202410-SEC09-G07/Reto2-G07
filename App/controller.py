@@ -30,7 +30,15 @@ from datetime import datetime
 """
 El controlador se encarga de mediar entre la vista y el modelo.
 """
+def measure_time(function):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = function(*args, **kwargs)
+        total = time.time() - start
+        print(total, 'seconds' )
+        return result
 
+    return wrapper
 
 def new_controller():
     """
@@ -180,7 +188,7 @@ def get_data(control, id):
     #TODO: Llamar la función del modelo para obtener un dato
     pass
 
-
+@measure_time
 def req_1(control, N, code_country, level):
     """
     Retorna el resultado del requerimiento 1
@@ -190,7 +198,7 @@ def req_1(control, N, code_country, level):
     
     return model.req_1(catalog, N, code_country, level)
 
-
+@measure_time
 def req_2(control):
     """
     Retorna el resultado del requerimiento 2
@@ -198,7 +206,7 @@ def req_2(control):
     # TODO: Modificar el requerimiento 2
     pass
 
-
+@measure_time
 def req_3(control, company_name, initial_date, final_date):
     """
     Retorna el resultado del requerimiento 3
@@ -223,7 +231,7 @@ def req_5(control):
     """
     # TODO: Modificar el requerimiento 5
     pass
-
+@measure_time
 def req_6(control, numero_ciudad, level, year):
     """
     Retorna el resultado del requerimiento 6

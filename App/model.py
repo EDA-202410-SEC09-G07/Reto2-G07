@@ -84,9 +84,6 @@ def new_data_structs(estructura,fc):
                                         maptype=estructura,
                                         loadfactor=fc)
     
-    
-
-    
     """
     Inicializa las estructuras de datos del modelo. Las crea de
     manera vacía para posteriormente almacenar la información.
@@ -180,47 +177,29 @@ def size(data_structs):
     return lt.size(data_structs)
 
 
-def req_1(control, N, code_country, level):
-    """
-    Función que soluciona el requerimiento 1
-    """
-    # TODO: Realizar el requerimiento 1
-    valores = mp.valueSet(control['jobs_ciudad'])
-    llaves = mp.keySet(control["jobs_ciudad"])
-    mapa = mp.newMap(numelements=10,
-           prime=20,
-           maptype='PROBING',
-           loadfactor = 1,
-           cmpfunction=None)
-    for job in lt.iterator(valores):
-        for llave in lt.iterator(llaves):
-            if job["elements"][0]["experience_level"] == level and (job["elements"][0]["country_code"]) == code_country:
-                mp.put(mapa, llave, job)
-    ofertas_pais = mp.size(mapa)
-    valores1 = mp.valueSet(mapa)   
-    llaves1 = mp.keySet(mapa)    
-    longitud = lt.size(valores)
-    longitud_llaves = lt.size(llaves)
-    valores2 = lt.subList(valores, longitud-N, N)
-    llaves2 = lt.subList(llaves, longitud_llaves-N, N)
-    mapa_retorno = mp.newMap(numelements=10,
-           prime=20,
-           maptype='PROBING',
-           loadfactor = 1,
-           cmpfunction=None)
-    valores3 = []
-    llaves3 = []
-    for valor in lt.iterator(valores2):
-        valores3.append(valor)
-    for llave in lt.iterator(llaves2):
-        llaves3.append(llave)
+def req_1(data_structs, N, country, level):
+    filter_data = lt.newList('ARRAY_LIST') # O(1)
+    map_by_country = data_structs['jobs_country'] # O(1)
+    country_jobs = (mp.get(map_by_country, country))['value'] # O(1)
     
-    i = 0
-    while i < N:
-        mp.put(mapa_retorno, llaves3[i], valores3[i])
-        i += 1
-    return mapa_retorno, ofertas_pais
-        
+    amount_jobs_country = lt.size(country_jobs)
+    
+    for job in lt.iterator(country_jobs): # O (h) siendo h la cantidad de ofertas que haya en la ciudad
+        if job['experience_level'] == level: # O(1)
+            lt.addLast(filter_data, job)
+
+    merg.sort(filter_data, sort_job_by_date) # O(klog(k)) siendo k la cantidad de ofertas que cumplan con el nivel de experiencia y el país
+    
+    amount_jobs_experience = lt.size(filter_data) # O(1)
+    
+    
+    if N > lt.size(filter_data): # O(1)
+        N = lt.size(filter_data)
+    
+    answer = lt.subList(filter_data, 1, N) # O(N) SIendo n la cantidad de datos que nos piden
+    
+    return answer, amount_jobs_country, amount_jobs_experience
+
 
 def req_2(data_structs):
     """
@@ -245,7 +224,6 @@ def req_3(control, company_name, initial_date, final_date):
     junior = 0
     mid = 0
     senior = 0
-    print(type(mapa_ofertas_empresa))
     
     for job in lt.iterator(valores):
         if job["elements"][0]['company_name'] == company_name and str(job["elements"][0]['published_at']) >= initial_date and str(job["elements"][0]['published_at']) <= final_date:
@@ -338,6 +316,7 @@ def req_8(control, level, divisa, initial_date, final_date):
     Función que soluciona el requerimiento 8
     """
     # TODO: Realizar el requerimiento 8
+    
     pass
 
 
@@ -352,6 +331,12 @@ def compare(data_1, data_2):
 
 # Funciones de ordenamiento
 
+def sort_job_by_date(job1, job2):
+    
+    # job1['published_at'] = datetime.datetime.strptime(job1['published_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+    # job2['published_at'] = datetime.datetime.strptime(job2['published_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+    
+    return job1['published_at'] > job2['published_at']
 
 def sort_criteria(data_1, data_2):
     """sortCriteria criterio de ordenamiento para las funciones de ordenamiento

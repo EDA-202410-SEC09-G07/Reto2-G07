@@ -83,9 +83,18 @@ def print_req_1(control, N, code_country, level):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    mapa = controller.req_1(control, N, code_country, level)[0]
-    print(mapa)
+    answer, amount_jobs_country, amount_jobs_experience = controller.req_1(control, N, code_country, level)
     
+    print("======================================== Requerimiento 1 ======================================")
+    print("\n Las ofertas de trabajo publicadas en el país: " + code_country + " son: " + str(amount_jobs_country))
+    print(f"Las ofertas de trabajo publicadas en el país: {code_country} por nivel de experiencia son: {amount_jobs_experience}")
+    print(f"Las {N} ofertas de trabajo publicadas en el país: {code_country} por nivel de experiencia {level} son: ")
+    
+    tabular_data = []
+    for job in lt.iterator(answer):
+        tabular_data.append(job)
+    
+    print(tabulate(tabular_data, tablefmt="fancy_grid"))
 
 def print_req_2(control):
     """
@@ -101,6 +110,8 @@ def print_req_3(control, company_name, initial_date, final_date):
     """
     # TODO: Imprimir el resultado del requerimiento 3
     lista_ofertas_empresa, juniors, mids, seniors  = controller.req_3(control, company_name, initial_date, final_date)
+    
+    print("======================================== Requerimiento 3 ======================================")
 
     print("Ofertas de trabajo publicadas por la empresa: " + company_name)
     print(lt.size(lista_ofertas_empresa))
@@ -141,7 +152,6 @@ def print_req_5(control):
     # TODO: Imprimir el resultado del requerimiento 5
     pass
 
-
 def print_req_6(control, numero_ciudad, level, year):
     """
         Función que imprime la solución del Requerimiento 6 en consola
@@ -151,9 +161,22 @@ def print_req_6(control, numero_ciudad, level, year):
     
     n_ciudades = controller.req_6(control, numero_ciudad, level, year)[1]
     n_empresas = controller.req_6(control, numero_ciudad, level, year)[2]
+    print("======================================== Requerimiento 6 ======================================")
     print(mapa)
     print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_ciudades))
     print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_empresas))
+    
+    for job in lt.iterator(mp.valueSet(mapa_retorno)):
+        print(f"Fechas: {job["elements"][0]['published_at']}")
+        print(f"Titulo Oferta: {job["elements"][0]['title']}")
+        print(f"Empresa: {job["elements"][0]['company_name']}")
+        print(f"Nivel de experiencia: {job["elements"][0]['experience_level']}")
+        print(f"País: {job["elements"][0]['country_code']}")
+        print(f"Ciudad de la oferta: {job["elements"][0]['city']}")
+        print(f"Tamaño de la empresa: {job["elements"][0]['company_size']}")
+        print(f"Tipo de empleo: {job["elements"][0]['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {job["elements"][0]['open_to_hire_ukrainians']}\n\n")
+        counter += 1
 
 def print_req_7(control):
     """
