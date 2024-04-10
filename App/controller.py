@@ -128,8 +128,7 @@ def load_data(control, mapa,tamaño, fc1,bandera):
     start_time = get_time()
 
     total_ofertas,total_empresas, total_ciudades = load_jobs(control['model'], tm)
-    
-    
+    load_skills(control['model'], tm)
 
     # finaliza el proceso para medir memoria
     Delta_memory = 0
@@ -166,8 +165,11 @@ def load_jobs(control, size):
     
     return total_ofertas, total_empresas, total_ciudades
     
-    
-
+def load_skills(control, size):
+    skills = cf.data_dir + str(size) + "skills.csv"
+    input_file = csv.DictReader(open(skills, encoding="utf-8"), delimiter=";")
+    for skill in input_file:
+        model.add_skills(control, skill)
 
 # Funciones de ordenamiento
 
@@ -241,13 +243,14 @@ def req_6(control, numero_ciudad, level, year):
     
     return model.req_6(catalog, numero_ciudad, level, year)
 
-
-def req_7(control):
+@measure_time
+def req_7(control, amount_countries, year, month):
     """
     Retorna el resultado del requerimiento 7
     """
     # TODO: Modificar el requerimiento 7
-    pass
+    
+    return model.req_7(control['model'], amount_countries, year, month)
 
 
 def req_8(control, level, divisa, initial_date, final_date):

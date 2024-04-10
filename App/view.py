@@ -19,7 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-
+from matplotlib.pylab import f
+from tabulate import tabulate
 import config as cf
 import sys
 import controller
@@ -29,8 +30,7 @@ from DISClib.ADT import queue as qu
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 assert cf
-from tabulate import tabulate
-import traceback
+
 
 """
 La vista se encarga de la interacción con el usuario
@@ -125,15 +125,15 @@ def print_req_3(control, company_name, initial_date, final_date):
         
         if counter == 21:
             break
-        print(f"Fechas: {job["elements"][0]['published_at']}")
-        print(f"Titulo Oferta: {job["elements"][0]['title']}")
-        print(f"Empresa: {job["elements"][0]['company_name']}")
-        print(f"Nivel de experiencia: {job["elements"][0]['experience_level']}")
-        print(f"País: {job["elements"][0]['country_code']}")
-        print(f"Ciudad de la oferta: {job["elements"][0]['city']}")
-        print(f"Tamaño de la empresa: {job["elements"][0]['company_size']}")
-        print(f"Tipo de empleo: {job["elements"][0]['workplace_type']}")
-        print(f"Disponibilidad Ucranianos {job["elements"][0]['open_to_hire_ukrainians']}\n\n")
+        print(f"Fechas: {job['elements'][0]['published_at']}")
+        print(f"Titulo Oferta: {job['elements'][0]['title']}")
+        print(f"Empresa: {job['elements'][0]['company_name']}")
+        print(f"Nivel de experiencia: {job['elements'][0]['experience_level']}")
+        print(f"País: {job['elements'][0]['country_code']}")
+        print(f"Ciudad de la oferta: {job['elements'][0]['city']}")
+        print(f"Tamaño de la empresa: {job['elements'][0]['company_size']}")
+        print(f"Tipo de empleo: {job['elements'][0]['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {job['elements'][0]['open_to_hire_ukrainians']}\n\n")
         counter += 1
 
 
@@ -157,8 +157,8 @@ def print_req_6(control, numero_ciudad, level, year):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    mapa = controller.req_6(control, numero_ciudad, level, year)[0]
-    
+    mapa_retorno = controller.req_6(control, numero_ciudad, level, year)[0]
+    counter = 0
     n_ciudades = controller.req_6(control, numero_ciudad, level, year)[1]
     n_empresas = controller.req_6(control, numero_ciudad, level, year)[2]
     print("======================================== Requerimiento 6 ======================================")
@@ -167,25 +167,38 @@ def print_req_6(control, numero_ciudad, level, year):
     print("El numero de ciudades que cumplen con las condiciones de consulta es: "+ str(n_empresas))
     
     for job in lt.iterator(mp.valueSet(mapa_retorno)):
-        print(f"Fechas: {job["elements"][0]['published_at']}")
-        print(f"Titulo Oferta: {job["elements"][0]['title']}")
-        print(f"Empresa: {job["elements"][0]['company_name']}")
-        print(f"Nivel de experiencia: {job["elements"][0]['experience_level']}")
-        print(f"País: {job["elements"][0]['country_code']}")
-        print(f"Ciudad de la oferta: {job["elements"][0]['city']}")
-        print(f"Tamaño de la empresa: {job["elements"][0]['company_size']}")
-        print(f"Tipo de empleo: {job["elements"][0]['workplace_type']}")
-        print(f"Disponibilidad Ucranianos {job["elements"][0]['open_to_hire_ukrainians']}\n\n")
+        print(f"Fechas: {job['elements'][0]['published_at']}")
+        print(f"Titulo Oferta: {job['elements'][0]['title']}")
+        print(f"Empresa: {job['elements'][0]['company_name']}")
+        print(f"Nivel de experiencia: {job['elements'][0]['experience_level']}")
+        print(f"País: {job['elements'][0]['country_code']}")
+        print(f"Ciudad de la oferta: {job['elements'][0]['city']}")
+        print(f"Tamaño de la empresa: {job['elements'][0]['company_size']}")
+        print(f"Tipo de empleo: {job['elements'][0]['workplace_type']}")
+        print(f"Disponibilidad Ucranianos {job['elements'][0]['open_to_hire_ukrainians']}\n\n")
         counter += 1
 
-def print_req_7(control):
+def print_req_7(control, amount_countries, year, month):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 7
-    pass
-
-
+    
+    amount_offers, amount_cities, best_country, best_city, levels = controller.req_7(control, amount_countries, year, month)
+    print("======================================== Requerimiento 7 - Respuestas ======================================")
+    print(f"\nLa cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {amount_offers}")
+    print(f"La cantidad de ciudades con ofertas de trabajo publicadas en el mes {month} del año {year} es: {amount_cities}")
+    pais_best_country = best_country["Pais"]
+    ciudad_best_city = best_city["Ciudad"]
+    cantidad_best_country = best_country["Cantidad de ofertas"]
+    cantidad_best_city = best_city["Cantidad de ofertas"]
+    print(f"El pais con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {f'{pais_best_country} con {cantidad_best_country} ofertas'}")
+    print(f"La ciudad con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {f'{ciudad_best_city} con {cantidad_best_city} ofertas'}")
+    print(f"Los niveles de experiencia con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} son: ")
+    headers = ['Level', '#Jobs', '#Skills', 'Best Skill', 'Worst Skill', 'Average', '# Companies', 'Best Company', 'Worst Company']
+    print(tabulate(levels, headers, tablefmt="fancy_grid", maxcolwidths=[5, 5,5, 30, 30, 5, 5, 30, 30]))
+    
+    
 def print_req_8(control):
     """
         Función que imprime la solución del Requerimiento 8 en consola
@@ -258,7 +271,7 @@ if __name__ == "__main__":
             company_name = input("Nombre de la empresa: ")
             initial_date = input("Fecha inicial (YYYY-MM-DD): ")
             final_date = input("Fecha final (YYYY-MM-DD): ")
-            print_req_3(control, company_name, initial_date, final_date)
+            # print_req_3(control, company_name, initial_date, final_date)
 
         elif int(inputs) == 5:
             print_req_4(control)
@@ -270,10 +283,16 @@ if __name__ == "__main__":
             numero_ciudad = input("Número de ciudades para consulta: ")
             level = input("Nivel de experticia: ")
             year = input("El año de la consulta: ")
-            print_req_6(control, numero_ciudad, level, year)
+            # print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
-            print_req_7(control)
+            print("=========== Requerimiento 7 ===========")
+            print("Clasificar los N países con mayor número de ofertas de trabajo.\n")
+            amount_countries = int(input("Número de países a listar: "))
+            year = str(input("Año de la consulta: "))
+            month = str(input("Mes de la consulta: "))
+
+            print_req_7(control, amount_countries, year, month)
 
         elif int(inputs) == 9:
             level = input("Nivel de experticia: ")
