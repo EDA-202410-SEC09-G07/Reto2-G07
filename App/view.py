@@ -176,10 +176,25 @@ def print_req_6(control):
     pass
 
 
-def print_req_7(data_structs, n_paises, año_consulta, mes_consulta):
+def print_req_7(control, amount_countries, year, month):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
+    # TODO: Imprimir el resultado del requerimiento 7
+    
+    amount_offers, amount_cities, best_country, best_city, levels = controller.req_7(control, amount_countries, year, month)
+    print("======================================== Requerimiento 7 - Respuestas ======================================")
+    print(f"\nLa cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {amount_offers}")
+    print(f"La cantidad de ciudades con ofertas de trabajo publicadas en el mes {month} del año {year} es: {amount_cities}")
+    pais_best_country = best_country["Pais"]
+    ciudad_best_city = best_city["Ciudad"]
+    cantidad_best_country = best_country["Cantidad de ofertas"]
+    cantidad_best_city = best_city["Cantidad de ofertas"]
+    print(f"El pais con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {f'{pais_best_country} con {cantidad_best_country} ofertas'}")
+    print(f"La ciudad con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} es: {f'{ciudad_best_city} con {cantidad_best_city} ofertas'}")
+    print(f"Los niveles de experiencia con mayor cantidad de ofertas de trabajo publicadas en el mes {month} del año {year} son: ")
+    headers = ['Level', '#Jobs', '#Skills', 'Best Skill', 'Worst Skill', 'Average', '# Companies', 'Best Company', 'Worst Company']
+    print(tabulate(levels, headers, tablefmt="fancy_grid", maxcolwidths=[5, 5,5, 30, 30, 5, 5, 30, 30]))
     
 
 def print_req_8(control):

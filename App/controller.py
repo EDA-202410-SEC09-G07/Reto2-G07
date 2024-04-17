@@ -240,8 +240,7 @@ def req_7(control, n_paises, año_consulta, mes_consulta ):
     Retorna el resultado del requerimiento 7
     """
     # TODO: Modificar el requerimiento 7
-    catalog = control["model"]
-    return model.req_7(catalog, n_paises, año_consulta, mes_consulta)
+    
 
 def req_8(control, level, divisa, initial_date, final_date):
     """
