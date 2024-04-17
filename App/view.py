@@ -180,29 +180,7 @@ def print_req_7(data_structs, n_paises, año_consulta, mes_consulta):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
-    resultados = controller.req_7(data_structs, n_paises, año_consulta, mes_consulta)
-
-    total_ofertas, cantidad_cities, max_country_name, max_country_count, max_city_name, max_city_count, expertises_info = resultados
-
-    print("Resultados del requerimiento 7:")
-    print("--------------------------------")
-    print(f"Total de ofertas de empleo: {total_ofertas}")
-    print(f"Número de ciudades donde se ofertó: {cantidad_cities}")
-    print(f"País con la mayor cantidad de ofertas: {max_country_name} ({max_country_count} ofertas)")
-    print(f"Ciudad con la mayor cantidad de ofertas: {max_city_name} ({max_city_count} ofertas)")
-
-    print("\nDetalle de las habilidades por nivel de experticia:")
-    for nivel, info in expertises_info.items():
-        print(f"\nNivel de experticia: {nivel}")
-        print(f"Total de habilidades solicitadas: {info['count_skills']}")
-        print(f"Habilidad más solicitada: {info['most_requested_skill']} ({info['most_requested_skill_count']} veces)")
-        print(f"Habilidad menos solicitada: {info['least_requested_skill']} ({info['least_requested_skill_count']} veces)")
-        print(f"Nivel mínimo promedio de las habilidades: {info['min_avg_skill_level']}")
-        print(f"Total de empresas que publicaron ofertas: {info['count_companies']}")
-        print(f"Empresa con mayor número de ofertas: {info['max_offer_company']} ({info['max_offer_company_count']} ofertas)")
-        print(f"Empresa con menor número de ofertas: {info['min_offer_company']} ({info['min_offer_company_count']} ofertas)")
-        print(f"Número de empresas con sedes: {info['multilocation_count']}")
-
+    
 
 def print_req_8(control):
     """
