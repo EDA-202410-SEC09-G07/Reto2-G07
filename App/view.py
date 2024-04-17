@@ -287,10 +287,13 @@ if __name__ == "__main__":
             print_req_6(control, numero_ciudad, level, year)
 
         elif int(inputs) == 8:
-            n_paises = input("Número de paises de consulta: ")
-            año_consulta = input("Año a consultar: ")
-            mes_consulta= input("Mes a consultar: ")
-            print_req_7(control, n_paises, año_consulta, mes_consulta) 
+            print("=========== Requerimiento 7 ===========")
+            print("Clasificar los N países con mayor número de ofertas de trabajo.\n")
+            amount_countries = int(input("Número de países a listar: "))
+            year = str(input("Año de la consulta: "))
+            month = str(input("Mes de la consulta: "))
+
+            print_req_7(control, amount_countries, year, month) 
 
         elif int(inputs) == 9:
             level = input("Nivel de experticia: ")

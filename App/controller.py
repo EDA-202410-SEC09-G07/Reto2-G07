@@ -235,11 +235,14 @@ def req_6(control, numero_ciudad, level, year):
     return model.req_6(catalog, numero_ciudad, level, year)
 
 
-def req_7(control, n_paises, año_consulta, mes_consulta ):
+def req_8(control, level, divisa, initial_date, final_date):
     """
-    Retorna el resultado del requerimiento 7
+    Retorna el resultado del requerimiento 8
     """
-    # TODO: Modificar el requerimiento 7
+    # TODO: Modificar el requerimiento 8
+    catalog = control['model']
+    
+    return model.req_8(catalog, level, divisa, initial_date, final_date)
     
 
 def req_8(control, level, divisa, initial_date, final_date):
